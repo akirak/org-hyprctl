@@ -109,7 +109,8 @@
                                    (or (caar layout)
                                        (org-element-property :contents-end workspace-el)))))
                  (current-ws-name (alist-get workspace-id current-wss)))
-            (unless (equal current-ws-name workspace-name)
+            (when (and (> workspace-id 0)
+                       (not (equal current-ws-name workspace-name)))
               (org-hyprctl--dispatch "renameworkspace"
                                      (number-to-string workspace-id)
                                      workspace-name))
