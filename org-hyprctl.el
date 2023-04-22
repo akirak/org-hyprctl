@@ -35,6 +35,8 @@
   ""
   :group 'org)
 
+(defconst org-hyprctl-buffer "*org hyprctl*")
+
 (defcustom org-hyprctl-executable "hyprctl"
   ""
   :type 'file)
@@ -50,24 +52,55 @@
 ;;;###autoload
 (defun org-hyprctl-update ()
   "Update the workspaces according to the block at point."
-  (when-let (element (org-element-context))
-    (when (and element
-               (eq 'special-block (org-element-type element))
-               (equal "hyprctl" (org-element-property :type element))
-               (equal "Hyprland" (getenv "XDG_CURRENT_DESKTOP")))
-      (save-excursion
-        (atomic-change-group
-          (if-let* ((inner-begin (org-element-property :contents-begin element))
-                    (inner-end (org-element-property :contents-end element)))
-              (progn
-                (goto-char inner-begin)
-                (org-hyprctl--apply (org-element-context)
-                                    (org-hyprctl--query "clients"))
-                (delete-region inner-begin inner-end))
+  (pcase (org-hyprctl--context)
+    (`(,start . ,end)
+     (save-excursion
+       (atomic-change-group
+         (goto-char start)
+         (unless (= start end)
+           (org-hyprctl--apply (org-element-context)
+                               (org-hyprctl--query "clients"))
+           (delete-region start end))
+         (insert (org-hyprctl--serialize (org-hyprctl--query "clients")))
+         t)))))
+
+(defun org-hyprctl--context ()
+  (if (eq major-mode 'org-hyprctl-mode)
+      (cons (point-min) (point-max))
+    (when-let (element (org-element-context))
+      (when (and element
+                 (eq 'special-block (org-element-type element))
+                 (equal "hyprctl" (org-element-property :type element))
+                 (equal "Hyprland" (getenv "XDG_CURRENT_DESKTOP")))
+        (if-let* ((inner-begin (org-element-property :contents-begin element))
+                  (inner-end (org-element-property :contents-end element)))
+            (cons inner-begin inner-end)
+          (save-excursion
             (goto-char (org-element-property :begin element))
-            (beginning-of-line 2))
-          (insert (org-hyprctl--serialize (org-hyprctl--query "clients")))
-          t)))))
+            (beginning-of-line 2)
+            (cons (point) (point))))))))
+
+;;;###autoload
+(defun org-hyprctl-popup ()
+  "Pop up a buffer for managing workspaces."
+  (interactive)
+  (let* ((existing-buffer (get-buffer org-hyprctl-buffer))
+         (buffer (or existing-buffer
+                     (generate-new-buffer org-hyprctl-buffer))))
+    (with-current-buffer buffer
+      (if existing-buffer
+          (erase-buffer)
+        (org-hyprctl-mode))
+      (insert (org-hyprctl--serialize (org-hyprctl--query "clients")))
+      (goto-char (point-min))
+      (pop-to-buffer buffer))))
+
+(defvar-keymap org-hyprctl-mode-map
+  :doc "Keymap for `org-hyprctl-mode'."
+  (kbd "C-c C-c") #'org-hyprctl-update)
+
+(define-derived-mode org-hyprctl-mode org-mode
+  "Org-based mode for managing Hyprland workspaces.")
 
 (defun org-hyprctl--query (command)
   (with-temp-buffer
