@@ -4,9 +4,9 @@
 
 ;; Author: Akira Komamura <akira.komamura@gmail.com>
 ;; Version: 0.1
-;; Package-Requires: ((emacs "26.1"))
-;; Keywords:
-;; URL: https://github.com/akirak/
+;; Package-Requires: ((emacs "29.1"))
+;; Keywords: unix tools
+;; URL: https://github.com/akirak/org-hyprctl/
 
 ;; This file is not part of GNU Emacs.
 
