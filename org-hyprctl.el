@@ -41,6 +41,7 @@
 
 ;;;###autoload
 (defun org-hyprctl-init ()
+  "Insert an Org block for managing the workspaces."
   (interactive)
   (insert "#+begin_hyprctl\n"
           (org-hyprctl--serialize (org-hyprctl--query "clients"))
@@ -48,6 +49,7 @@
 
 ;;;###autoload
 (defun org-hyprctl-update ()
+  "Update the workspaces according to the block at point."
   (when-let (element (org-element-context))
     (when (and element
                (eq 'special-block (org-element-type element))
