@@ -97,7 +97,7 @@
 
 (defvar-keymap org-hyprctl-mode-map
   :doc "Keymap for `org-hyprctl-mode'."
-  (kbd "C-c C-c") #'org-hyprctl-update)
+  "C-c C-c" #'org-hyprctl-update)
 
 (define-derived-mode org-hyprctl-mode org-mode
   "Org-based mode for managing Hyprland workspaces.")
