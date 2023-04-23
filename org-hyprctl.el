@@ -52,6 +52,7 @@
 ;;;###autoload
 (defun org-hyprctl-update ()
   "Update the workspaces according to the block at point."
+  (interactive)
   (pcase (org-hyprctl--context)
     (`(,start . ,end)
      (save-excursion
