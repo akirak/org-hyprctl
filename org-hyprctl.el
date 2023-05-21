@@ -96,9 +96,11 @@
       (goto-char (point-min))
       (pop-to-buffer buffer))))
 
-(defvar-keymap org-hyprctl-mode-map
-  :doc "Keymap for `org-hyprctl-mode'."
-  "C-c C-c" #'org-hyprctl-update)
+(defvar org-hyprctrl-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-c") #'org-hyprctl-update)
+    map)
+  "Keymap for `org-hyprctl-mode'.")
 
 (define-derived-mode org-hyprctl-mode org-mode
   "Org-based mode for managing Hyprland workspaces.")
