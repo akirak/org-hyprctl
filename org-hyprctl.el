@@ -99,6 +99,7 @@
 (defvar org-hyprctrl-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-c") #'org-hyprctl-update)
+    (define-key map (kbd "C-c C-k") #'kill-this-buffer)
     map)
   "Keymap for `org-hyprctl-mode'.")
 
