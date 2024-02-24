@@ -110,7 +110,8 @@
     (unless (zerop (call-process org-hyprctl-executable nil t nil
                                  command
                                  "-j"))
-      (error "hyprctl returned non-zero exit code: "
+      (error "Command %s failed with a non-zero exit code: %s"
+             (list org-hyprctl-executable command)
              (buffer-string)))
     (goto-char (point-min))
     (json-parse-buffer :array-type 'list :object-type 'alist)))
