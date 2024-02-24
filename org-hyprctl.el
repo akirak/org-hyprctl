@@ -1,6 +1,6 @@
 ;;; org-hyprctl.el --- Manage Hyprctl workspaces from Org mode -*- lexical-binding: t -*-
 
-;; Copyright (C) 2023 Akira Komamura
+;; Copyright (C) 2023-2024 Akira Komamura
 
 ;; Author: Akira Komamura <akira.komamura@gmail.com>
 ;; Version: 0.1
