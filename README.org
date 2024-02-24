@@ -1,0 +1,14 @@
+* org-hyprctl
+Manage workspaces of [[https://hyprland.org/][Hyprland]] from inside Emacs by declaratively defining a list of windows in an Org source block.
+** Configuration
+You may have to load ~HYPRLAND_INSTANCE_SIGNATURE~ variable from your graphical environment.
+You can use [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]] for this:
+
+#+begin_src elisp
+  (use-package exec-path-from-shell
+    :ensure t
+    :config
+    (add-to-list 'exec-path-from-shell-variables "HYPRLAND_INSTANCE_SIGNATURE"))
+#+end_src
+** Usage
+Run ~org-hyprctl-popup~, edit the list of windows grouped by workspaces, and press ~C-c C-c~.
