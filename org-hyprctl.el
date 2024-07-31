@@ -130,7 +130,7 @@
       (goto-char (point-min))
       (pop-to-buffer buffer))))
 
-(defvar org-hyprctrl-mode-map
+(defvar org-hyprctl-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-c") #'org-hyprctl-update)
     (define-key map (kbd "C-c C-k") #'kill-this-buffer)
