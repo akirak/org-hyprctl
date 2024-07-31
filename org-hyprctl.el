@@ -41,6 +41,30 @@
   ""
   :type 'file)
 
+(defvar org-hyprctl-instance-signature nil)
+
+(defmacro org-hyprctl--with-environment (&rest body)
+  `(let ((process-environment (if (getenv "HYPRLAND_INSTANCE_SIGNATURE")
+                                  process-environment
+                                (cons (concat "HYPRLAND_INSTANCE_SIGNATURE="
+                                              (or org-hyprctl-instance-signature
+                                                  (org-hyprctl--set-signature)))
+                                      process-environment))))
+     ,@body))
+
+(defun org-hyprctl--instance-signature ()
+  "Get the signature of the running hyprland instance."
+  (with-temp-buffer
+    (call-process org-hyprctl-executable nil (list t nil) nil
+                  "instances" "-j")
+    (goto-char (point-min))
+    (pcase-exhaustive (json-parse-buffer :object-type 'plist :array-type 'list)
+      (`(,(map :instance))
+       instance))))
+
+(defun org-hyprctl--set-signature ()
+  (setq org-hyprctl-instance-signature (org-hyprctl--instance-signature)))
+
 ;;;###autoload
 (defun org-hyprctl-init ()
   "Insert an Org block for managing the workspaces."
@@ -108,9 +132,10 @@
 
 (defun org-hyprctl--query (command)
   (with-temp-buffer
-    (unless (zerop (call-process org-hyprctl-executable nil t nil
-                                 command
-                                 "-j"))
+    (unless (zerop (org-hyprctl--with-environment
+                    (call-process org-hyprctl-executable nil t nil
+                                  command
+                                  "-j")))
       (error "Command %s failed with a non-zero exit code: %s"
              (list org-hyprctl-executable command)
              (buffer-string)))
@@ -118,8 +143,9 @@
     (json-parse-buffer :array-type 'list :object-type 'alist)))
 
 (defun org-hyprctl--dispatch (&rest args)
-  (apply #'call-process org-hyprctl-executable nil nil nil
-         "dispatch" args))
+  (org-hyprctl--with-environment
+   (apply #'call-process org-hyprctl-executable nil nil nil
+          "dispatch" args)))
 
 (defun org-hyprctl--apply (config clients)
   (if (and (eq 'plain-list (org-element-type config))
