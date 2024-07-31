@@ -31,6 +31,16 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+(require 'subr-x)
+(require 'pcase)
+(require 'map)
+(require 'org)
+
+(declare-function org-element-item-parser "org-element")
+(declare-function org-element-property "org-element-ast")
+(declare-function org-element-type "org-element-ast")
+
 (defgroup org-hyprctl nil
   ""
   :group 'org)
@@ -160,8 +170,7 @@
                            (mapcar (lambda (x)
                                      (cons (alist-get 'id x)
                                            (alist-get 'name x))))))
-            (layout (org-element-property :structure config))
-            client-config)
+            (layout (org-element-property :structure config)))
         (while layout
           (let* ((workspace (pop layout))
                  (workspace-id (string-to-number (nth 5 workspace)))
